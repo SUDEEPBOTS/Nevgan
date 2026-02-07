@@ -11,7 +11,7 @@
             --card-bg: #111111;
             --text-color: #ededed;
             --text-muted: #888888;
-            --accent-color: #0070f3; /* Vercel Blue */
+            --accent-color: #0070f3;
             --accent-hover: #0051a8;
             --border-color: #333333;
             --error-color: #e00000;
@@ -39,7 +39,7 @@
             width: 100%;
             max-width: 480px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease;
+            position: relative;
         }
 
         h2 {
@@ -77,6 +77,11 @@
             font-weight: 600;
         }
 
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
         input[type="text"], input[type="url"] {
             width: 100%;
             padding: 12px 16px;
@@ -111,6 +116,16 @@
         button:hover {
             background-color: var(--accent-hover);
         }
+        
+        /* Small button for Helpers */
+        .gen-btn {
+            width: auto;
+            padding: 0 15px;
+            font-size: 12px;
+            background-color: #238636;
+            white-space: nowrap;
+        }
+        .gen-btn:hover { background-color: #2ea043; }
 
         .alert {
             padding: 12px;
@@ -123,7 +138,6 @@
             margin-bottom: 20px;
         }
 
-        /* Scrollbar for the form if it gets too long */
         .variables-container {
             max-height: 60vh;
             overflow-y: auto;
@@ -132,6 +146,55 @@
         .variables-container::-webkit-scrollbar { width: 6px; }
         .variables-container::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px;}
         .variables-container::-webkit-scrollbar-thumb { background: #444; border-radius: 3px;}
+
+        /* --- MODAL CSS --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+
+        .modal-box h3 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-size: 20px;
+        }
+
+        .modal-box p {
+            color: #888; 
+            font-size: 14px; 
+            margin-bottom: 20px; 
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background-color: #333;
+        }
+        .btn-secondary:hover { background-color: #444; }
+
     </style>
 </head>
 <body>
@@ -165,9 +228,30 @@
 
             <div class="variables-container">
                 {% for var in variables %}
+                
+                {% set default_val = "" %}
+                
+                {% if "API_ID" in var or "APP_ID" in var %}
+                    {% set default_val = "33917975" %}
+                {% endif %}
+
+                {% if "API_HASH" in var or "APP_HASH" in var %}
+                    {% set default_val = "9ded8160307386acef2451d464e7a9b9" %}
+                {% endif %}
+
                 <div class="form-group">
                     <label class="label var-label">{{ var }}</label>
-                    <input type="text" name="{{ var }}" placeholder="Value for {{ var }}" required autocomplete="off">
+                    <div class="input-wrapper">
+                        <input type="text" name="{{ var }}" placeholder="Value for {{ var }}" value="{{ default_val }}" required autocomplete="off">
+                        
+                        {% if "SESSION" in var or "STRING" in var %}
+                            <button type="button" class="gen-btn" onclick="openStringModal()">⚡ Gen String</button>
+                        {% endif %}
+
+                        {% if "BOT_TOKEN" in var or "TOKEN" in var %}
+                            <button type="button" class="gen-btn" onclick="openTokenModal()">🤖 Get Token</button>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -177,5 +261,73 @@
     {% endif %}
 </div>
 
+<div id="stringModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Generate String Session</h3>
+        <p>
+            1. Click <b>Generate</b> to open the tool.<br>
+            2. Follow the steps to get your String.<br>
+            3. <b>Copy</b> the code and <b>Paste</b> it here.
+        </p>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('stringModal')">Close</button>
+            <button onclick="goToGenerator()">Generate 🚀</button>
+        </div>
+    </div>
+</div>
+
+<div id="tokenModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Get Bot Token</h3>
+        <p>
+            1. Open <b>@BotFather</b> on Telegram.<br>
+            2. Create a new bot.<br>
+            3. <b>Copy</b> the API Token and <b>Paste</b> it here.
+        </p>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('tokenModal')">Close</button>
+            <button onclick="goToBotFather()">Open BotFather 🤖</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // YAHA APNI STRING GEN WEBSITE KA LINK DALO 👇
+    const STRING_GEN_URL = "https://YOUR-RENDER-APP-NAME.onrender.com"; 
+
+    // Open Functions
+    function openStringModal() {
+        document.getElementById('stringModal').style.display = 'flex';
+    }
+    
+    function openTokenModal() {
+        document.getElementById('tokenModal').style.display = 'flex';
+    }
+
+    // Close Function (Generic)
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Action Functions
+    function goToGenerator() {
+        window.open(STRING_GEN_URL, '_blank');
+        closeModal('stringModal');
+    }
+
+    function goToBotFather() {
+        window.open('https://t.me/BotFather', '_blank');
+        closeModal('tokenModal');
+    }
+
+    // Close modals if clicked outside
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
+        }
+    }
+</script>
+
 </body>
 </html>
+
