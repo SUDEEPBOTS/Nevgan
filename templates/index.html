@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.env Generator | GitHub Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #111111;
+            --text-color: #ededed;
+            --text-muted: #888888;
+            --accent-color: #0070f3; /* Vercel Blue */
+            --accent-hover: #0051a8;
+            --border-color: #333333;
+            --error-color: #e00000;
+            --success-color: #0070f3;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #222222 0%, var(--bg-color) 70%);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .var-label {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="url"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .alert {
+            padding: 12px;
+            background-color: rgba(224, 0, 0, 0.1);
+            border: 1px solid var(--error-color);
+            color: #ff6b6b;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Scrollbar for the form if it gets too long */
+        .variables-container {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .variables-container::-webkit-scrollbar { width: 6px; }
+        .variables-container::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px;}
+        .variables-container::-webkit-scrollbar-thumb { background: #444; border-radius: 3px;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Generate .env File</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if step == "input_repo" %}
+        <p class="subtitle">Paste a GitHub repository URL to auto-detect example environment variables.</p>
+        <form method="POST">
+            <div class="form-group">
+                <label class="label" for="repo_url">GitHub Repository URL</label>
+                <input type="url" id="repo_url" name="repo_url" placeholder="https://github.com/username/project" required autocomplete="off">
+            </div>
+            <button type="submit">Analyze Repository →</button>
+        </form>
+
+    {% elif step == "fill_form" %}
+        <p class="subtitle">Variables found! Fill in the values below.</p>
+        
+        <form action="/download" method="POST">
+            <input type="hidden" name="repo_url" value="{{ repo_url }}">
+
+            <div class="variables-container">
+                {% for var in variables %}
+                <div class="form-group">
+                    <label class="label var-label">{{ var }}</label>
+                    <input type="text" name="{{ var }}" placeholder="Value for {{ var }}" required autocomplete="off">
+                </div>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" style="margin-top: 20px;">Download .env File ↓</button>
+        </form>
+    {% endif %}
+</div>
+
+</body>
+</html>
