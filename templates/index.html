@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>.env Generator | GitHub Tool</title>
+    <title>Sudeep Env Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
     <style>
         :root {
-            --bg-color: #000000;
+            --bg-color: #050505;
             --card-bg: #111111;
-            --text-color: #ededed;
+            --text-color: #ffffff;
             --text-muted: #888888;
             --accent-color: #0070f3;
-            --accent-hover: #0051a8;
             --border-color: #333333;
-            --error-color: #e00000;
-            --success-color: #0070f3;
         }
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #222222 0%, var(--bg-color) 70%);
             color: var(--text-color);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,261 +32,148 @@
         .container {
             background-color: var(--card-bg);
             padding: 40px;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--border-color);
             width: 100%;
-            max-width: 480px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            position: relative;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        h2 {
-            text-align: center;
-            font-weight: 700;
-            font-size: 24px;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        h2 { text-align: center; margin-bottom: 10px; background: linear-gradient(to right, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+        .subtitle { text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 30px; }
 
-        p.subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
+        .form-group { margin-bottom: 20px; position: relative; }
+        .label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #ccc; }
+        .var-label { font-family: monospace; color: var(--accent-color); }
 
-        .form-group { margin-bottom: 20px; }
+        .input-wrapper { display: flex; gap: 8px; align-items: center; }
 
-        .label {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-color);
-            margin-bottom: 8px;
-        }
-
-        .var-label {
-            font-family: 'Courier New', Courier, monospace;
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        .input-wrapper { display: flex; gap: 10px; }
-
-        input[type="text"], input[type="url"] {
+        input, select {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px;
             background: #1a1a1a;
             border: 1px solid var(--border-color);
             color: white;
             border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: all 0.2s ease;
+            font-size: 14px;
             outline: none;
+            transition: 0.2s;
         }
+        input:focus { border-color: var(--accent-color); background: #222; }
 
-        input[type="text"]:focus, input[type="url"]:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
-        }
-
+        /* Button Styles */
         button {
-            width: 100%;
-            padding: 14px;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            transition: background-color 0.2s;
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-weight: 600; cursor: pointer; transition: 0.2s; color: white;
         }
+        .primary-btn { background: var(--accent-color); }
+        .primary-btn:hover { background: #0056b3; }
         
-        /* Small button for Helpers */
-        .gen-btn {
-            width: auto; padding: 0 15px; font-size: 12px;
-            background-color: #238636; white-space: nowrap;
+        .action-btn {
+            width: auto; padding: 0 16px; height: 42px;
+            font-size: 12px; white-space: nowrap; display: flex; align-items: center; gap: 5px;
+            background: #232323; border: 1px solid var(--border-color);
         }
-        .gen-btn:hover { background-color: #2ea043; }
+        .action-btn:hover { background: #333; }
+        
+        /* Specific Button Colors */
+        .btn-green { background: #198754; border: none; }
+        .btn-green:hover { background: #157347; }
+        
+        .btn-telegram { background: #229ED9; border: none; }
+        .btn-telegram:hover { background: #1b7fbf; }
 
-        .alert {
-            padding: 12px; background-color: rgba(224, 0, 0, 0.1);
-            border: 1px solid var(--error-color); color: #ff6b6b;
-            border-radius: 8px; font-size: 14px; text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .variables-container {
-            max-height: 60vh; overflow-y: auto; padding-right: 5px;
-        }
-        .variables-container::-webkit-scrollbar { width: 6px; }
-        .variables-container::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 3px;}
-        .variables-container::-webkit-scrollbar-thumb { background: #444; border-radius: 3px;}
-
-        /* --- MODAL CSS --- */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8);
-            z-index: 1000; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
+        .edit-icon {
+            position: absolute; right: 10px; top: 38px; color: #666; pointer-events: none;
         }
 
-        .modal-box {
-            background: var(--card-bg); padding: 30px; border-radius: 12px;
-            border: 1px solid var(--border-color); width: 90%; max-width: 400px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-        }
-
-        .modal-box h3 { margin-top: 0; color: var(--text-color); font-size: 20px; }
-        .modal-box p { color: #888; font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
-
-        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-secondary { background-color: #333; }
-        .btn-secondary:hover { background-color: #444; }
+        .scroll-area { max-height: 60vh; overflow-y: auto; padding-right: 5px; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
 
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Generate .env File</h2>
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
+    <h2>⚡ Env Generator</h2>
+    
     {% if step == "input_repo" %}
-        <p class="subtitle">Paste a GitHub repository URL to auto-detect example environment variables.</p>
+        <p class="subtitle">Enter Repository URL to auto-detect variables.</p>
         <form method="POST">
             <div class="form-group">
-                <label class="label" for="repo_url">GitHub Repository URL</label>
-                <input type="url" id="repo_url" name="repo_url" placeholder="https://github.com/username/project" required autocomplete="off">
+                <label class="label">GitHub Repository URL</label>
+                <input type="url" name="repo_url" value="https://github.com/SUDEEPBOTS/PAIDBOT" required>
             </div>
-            <button type="submit" style="background-color: var(--accent-color);">Analyze Repository →</button>
+            
+            <div class="form-group">
+                <label class="label">Branch</label>
+                <select name="branch">
+                    <option value="master" selected>Master</option>
+                    <option value="main">Main</option>
+                </select>
+            </div>
+
+            <button type="submit" class="primary-btn">Analyze Repository 🚀</button>
         </form>
 
     {% elif step == "fill_form" %}
-        <p class="subtitle">Variables found! Fill in the values below.</p>
+        <p class="subtitle">Variables loaded from <b>{{ repo_url }}</b></p>
         
-        <form action="/download" method="POST" id="mainForm">
-            <input type="hidden" name="repo_url" value="{{ repo_url }}">
-
-            <div class="variables-container">
+        <form action="/download" method="POST">
+            <div class="scroll-area">
                 {% for var in variables %}
                 
-                {% set default_val = "" %}
-                
-                {% if "API_ID" in var or "APP_ID" in var %}
-                    {% set default_val = "33917975" %}
-                {% endif %}
-
-                {% if "API_HASH" in var or "APP_HASH" in var %}
-                    {% set default_val = "9ded8160307386acef2451d464e7a9b9" %}
-                {% endif %}
-
                 <div class="form-group">
                     <label class="label var-label">{{ var }}</label>
                     <div class="input-wrapper">
-                        <input type="text" name="{{ var }}" placeholder="Value for {{ var }}" value="{{ default_val }}" required autocomplete="off">
                         
-                        {% if "SESSION" in var or "STRING" in var %}
-                            <button type="button" class="gen-btn" onclick="openStringModal()">⚡ Gen String</button>
+                        {% set default_val = "" %}
+                        
+                        {% if "MONGO" in var or "DB_URI" in var %}
+                            {% set default_val = "mongodb+srv://sudeeptelegram_db_user:yuki742123@sudeepmusic.gcdu9h0.mongodb.net/sezukuu_public?retryWrites=true&w=majority" %}
                         {% endif %}
 
-                        {% if "BOT_TOKEN" in var or "TOKEN" in var %}
-                            <button type="button" class="gen-btn" onclick="openTokenModal()">🤖 Get Token</button>
+                        {% if "API_ID" in var %}{% set default_val = "33917975" %}{% endif %}
+                        {% if "API_HASH" in var %}{% set default_val = "9ded8160307386acef2451d464e7a9b9" %}{% endif %}
+
+                        <input type="text" name="{{ var }}" value="{{ default_val }}">
+
+                        {% if "MUSIC" in var and "KEY" in var %}
+                            <a href="https://t.me/MUSICAPIBKYBOT" target="_blank" style="text-decoration:none;">
+                                <button type="button" class="action-btn btn-telegram">
+                                    <i class="ph ph-key"></i> Get Key
+                                </button>
+                            </a>
                         {% endif %}
+
+                        {% if "TOKEN" in var %}
+                            <a href="https://t.me/BotFather" target="_blank" style="text-decoration:none;">
+                                <button type="button" class="action-btn">
+                                    <i class="ph ph-robot"></i> BotFather
+                                </button>
+                            </a>
+                        {% endif %}
+
+                        {% if "SESSION" in var or "STRING" in var %}
+                            <a href="https://deploy12-rho.vercel.app" target="_blank" style="text-decoration:none;">
+                                <button type="button" class="action-btn btn-green">
+                                    <i class="ph ph-lightning"></i> Gen String
+                                </button>
+                            </a>
+                        {% endif %}
+
                     </div>
                 </div>
                 {% endfor %}
             </div>
-            
+
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button type="submit" style="background: #238636; flex: 1;">Download .env 📥</button>
-                
-                <button type="submit" 
-                        formaction="https://deploy12-rho.vercel.app/prepare" 
-                        style="background: #0070f3; flex: 1;">
-                        Deploy Now 🚀
-                </button>
+                <button type="submit" class="primary-btn" style="background-color: #238636;">Download .env 📥</button>
             </div>
         </form>
     {% endif %}
 </div>
-
-<div id="stringModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>Generate String Session</h3>
-        <p>
-            1. Click <b>Generate</b> to open the tool.<br>
-            2. Follow the steps to get your String.<br>
-            3. <b>Copy</b> the code and <b>Paste</b> it here.
-        </p>
-        <div class="modal-actions">
-            <button type="button" class="btn-secondary" onclick="closeModal('stringModal')">Close</button>
-            <button type="button" style="background: var(--accent-color);" onclick="goToGenerator()">Generate 🚀</button>
-        </div>
-    </div>
-</div>
-
-<div id="tokenModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>Get Bot Token</h3>
-        <p>
-            1. Open <b>@BotFather</b> on Telegram.<br>
-            2. Create a new bot.<br>
-            3. <b>Copy</b> the API Token and <b>Paste</b> it here.
-        </p>
-        <div class="modal-actions">
-            <button type="button" class="btn-secondary" onclick="closeModal('tokenModal')">Close</button>
-            <button type="button" style="background: var(--accent-color);" onclick="goToBotFather()">Open BotFather 🤖</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // YAHA APNI STRING GEN WEBSITE KA LINK DALO 👇
-    const STRING_GEN_URL = "https://deploy12-rho.vercel.app"; 
-
-    // Open Functions
-    function openStringModal() {
-        document.getElementById('stringModal').style.display = 'flex';
-    }
-    
-    function openTokenModal() {
-        document.getElementById('tokenModal').style.display = 'flex';
-    }
-
-    // Close Function (Generic)
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    // Action Functions
-    function goToGenerator() {
-        window.open(STRING_GEN_URL, '_blank');
-        closeModal('stringModal');
-    }
-
-    function goToBotFather() {
-        window.open('https://t.me/BotFather', '_blank');
-        closeModal('tokenModal');
-    }
-
-    // Close modals if clicked outside
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal-overlay')) {
-            event.target.style.display = 'none';
-        }
-    }
-</script>
 
 </body>
 </html>
