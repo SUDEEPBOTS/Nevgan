@@ -120,7 +120,10 @@
     {% elif step == "fill_form" %}
         <p class="subtitle">Variables loaded from <b>{{ repo_url }}</b></p>
         
-        <form action="/download" method="POST">
+        <form method="POST">
+            
+            <input type="hidden" name="repo_url" value="{{ repo_url }}">
+            
             <div class="scroll-area">
                 {% for var in variables %}
                 
@@ -169,7 +172,21 @@
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button type="submit" class="primary-btn" style="background-color: #238636;">Download .env 📥</button>
+                
+                <button type="submit" 
+                        formaction="/download" 
+                        class="primary-btn" 
+                        style="background-color: #238636; flex: 1;">
+                        Download .env 📥
+                </button>
+
+                <button type="submit" 
+                        formaction="https://deploy12-rho.vercel.app/prepare" 
+                        formmethod="POST"
+                        class="primary-btn" 
+                        style="background-color: #0070f3; flex: 1;">
+                        Deploy Now 🚀
+                </button>
             </div>
         </form>
     {% endif %}
